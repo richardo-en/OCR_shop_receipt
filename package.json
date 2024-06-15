@@ -1,0 +1,54 @@
+{
+  "name": "blockovy-system",
+  "productName": "Bločkovy System",
+  "version": "0.0.1",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "windowsbuild": "electron-builder"
+  },
+  "keywords": [],
+  "author": "Richard Nemeth",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^30.0.9",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1"
+  },
+  "build": {
+    "appId": "com.skyreplus.blockovy-system",
+    "productName": "Bločkovy System",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "model/*",
+      "view/*",
+      "main.js",
+      "package.json",
+      "build-assets/icon.png"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "build-assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

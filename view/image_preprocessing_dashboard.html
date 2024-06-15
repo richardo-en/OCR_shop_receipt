@@ -1,0 +1,78 @@
+<script src="../js/image_preprocessing_settings.js"></script>
+<div class="mb-5">
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="noise">
+        <label class="form-check-label" for="noise">Noise Removing</label>
+        <div class="d-none specific_values w-50 align-items-center">
+            <label for="noice_reduction" class="form-label">Noise Reduction</label>
+            <input type="range" min="0" max="30" value="10" class="form-range" id="noice_reduction" aria-label="Parameter určujúci silu redukcie šumu. Vyššia hodnota znamená silnejšiu redukciu šumu.">
+            <label for="colored_noice_reduction" class="form-label">Noise Reduction for colored pictures</label>
+            <input type="range" min="0" max="30" value="10" class="form-range" id="colored_noice_reduction" aria-label="Parameter určujúci silu redukcie šumu pre farebne obrazky. Vyššia hodnota znamená silnejšiu redukciu šumu.">
+        </div>
+    </div>
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="grayscale">
+        <label class="form-check-label" for="grayscale">Set Grayscale</label>
+    </div>
+    
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="thresholding">
+        <label class="form-check-label" for="thresholding">Thresholding</label>
+        <div class="d-none specific_values w-50 align-items-center">
+            <label for="thresh" class="form-label">Thresh</label>
+            <input type="range" min="0" max="255" value="0" class="form-range" id="thresh" aria-label="Práh, nad ktorým sa pixel považuje za biely alebo čierny.">
+            <label for="maxval" class="form-label">Maxval</label>
+            <input type="range" min="0" max="255" value="255" class="form-range" id="maxval" aria-label="Maximálna hodnota, ktorú môže mať pixel po prahu.">
+        </div>
+    </div>
+    
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="deskew">
+        <label class="form-check-label" for="deskew">Deskew</label>
+    </div>
+    
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="normalize_image">
+        <label class="form-check-label" for="normalize_image">Normalizing</label>
+        <div class="d-none specific_values w-50 align-items-center">
+            <label for="normalizing_bottom" class="form-label">Bottom Value</label>
+            <input type="range" min="-255" max="255" value="0" class="form-range" id="normalizing_bottom" >
+            <label for="normalizing_top" class="form-label">Maximum Value</label>
+            <input type="range" min="-255" max="255" value="0" class="form-range" id="normalizing_top">
+        </div>
+    </div>
+
+    
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="image_dpi">
+        <label class="form-check-label" for="image_dpi">Set Image Dpi</label>
+    </div>
+    
+    <div class="form-check" role="group">
+        <input type="checkbox" class="form-check-input preprocessing_checks" id="normalize_image">
+        <label class="form-check-label" for="enhance_black_lines">Enhance black lines</label>
+        <div class="d-none specific_values w-50 align-items-center">
+            <label for="enhance_black_lines_bottom" class="form-label">Bottom Value</label>
+            <input type="range" min="0" max="255" value="0" class="form-range" id="enhance_black_lines_bottom" >
+            <label for="enhance_black_lines_top" class="form-label">Top Value</label>
+            <input type="range" min="0" max="255" value="255" class="form-range" id="enhance_black_lines_top">
+            <label for="enhance_black_lines_thikness" class="form-label">Thikness</label>
+            <input type="range" min="1" max="10" value="0" class="form-range" id="enhance_black_lines_thikness" >
+        </div>
+    </div>
+
+</div>
+
+<div class="d-flex justify-content-around container">
+    <div class="d-flex flex-column">
+        <label class="my-3" for="not_proccesed_image">Original capture</label>
+        <img class="w-75" id="not_proccesed_image" src="../not_preprocessed.png">
+    </div>
+    <div class="d-flex flex-column">
+        <label class="my-3" for="not_proccesed_image">Preprocessed Image</label>
+        <img class="w-75" id="proccesed_image" src="../processed_data.png">
+    </div>
+</div>
+
+<button id="img_preprocessing_capture" class="btn btn-primary">Capture record</button>
+<button type="submit" id="image_preprocessing_options" class="btn btn-success">Save</button>

@@ -1,0 +1,5 @@
+blockovy-system@1.0.0 /home/richard/Documents/projects/blockovy system
+├── bootstrap@5.3.3
+├── electron@30.0.9
+└── jquery@3.7.1
+
