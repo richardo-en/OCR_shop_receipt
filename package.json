@@ -2,14 +2,24 @@
   "name": "blockovy-system",
   "productName": "Bločkovy System",
   "version": "0.0.1",
-  "description": "",
+  "description": "System for accountants that captures frames from camera and fetches text from receipts. From These receipts are than taken numbers and are placed to newly created excel file.",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "windowsbuild": "electron-builder"
+    "development" : "nodemon --exec electron .",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir",
+    "postinstall": "electron-builder install-app-deps",
+    "distwin": "electron-builder -- --win -x64"
   },
-  "keywords": [],
   "author": "Richard Nemeth",
+  "keywords": [
+    "Bločkový",
+    "blockovy",
+    "receipt",
+    "Bločkový system",
+    "blockovy system",
+    "receipt system"
+  ],
   "license": "MIT",
   "devDependencies": {
     "electron": "^30.0.9",
@@ -17,34 +27,32 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "electron-squirrel-startup": "^1.0.1",
+    "electron-updater": "^6.2.1",
     "jquery": "^3.7.1"
   },
   "build": {
-    "appId": "com.skyreplus.blockovy-system",
-    "productName": "Bločkovy System",
+    "appId": "com.receipt-system",
+    "productName": "Receipt OCR",
     "directories": {
       "output": "dist"
     },
     "files": [
-      "dist/**/*",
-      "node_modules/**/*",
-      "model/*",
-      "view/*",
+      "model/*.py",
+      "view/",
       "main.js",
       "package.json",
-      "build-assets/icon.png"
+      "icon.ico",
+      "./preload.js"
     ],
     "win": {
+      "requestedExecutionLevel": "requireAdministrator",
       "target": [
         {
-          "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32"
-          ]
+          "target": "nsis"
         }
       ],
-      "icon": "build-assets/icon.png"
+      "icon": "icon.ico"
     },
     "nsis": {
       "oneClick": false,
