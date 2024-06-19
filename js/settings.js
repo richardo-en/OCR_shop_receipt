@@ -1,27 +1,15 @@
 // Check if fs module is already defined
-var fs, path, settingsPath;
-if (typeof fs === 'undefined') {
-    var fs = require('fs');
-}
-
-// Check if path module is already defined
-if (typeof path === 'undefined') {
-    var path = require('path');
-}
-
-// Check if jQuery is already defined
+var settingsPath;
 if (typeof $ === 'undefined') {
-    window.$ = window.jQuery = require('jquery');
-}
-
-if (typeof settingsPath === 'undefined') {
-    settingsPath = path.join(__dirname, '../settings.txt');
+    window.$ = require('jquery');
 }
 
 
 $(document).ready(function() {
+    const fs = require('fs');
+    const path = require('path');
+    settingsPath = path.join(__dirname, '../settings.txt');
     loadSettings();
-
     $('#save-settings').on('click', function(event) {
         event.preventDefault();
 
@@ -33,9 +21,9 @@ $(document).ready(function() {
 
         try {
             fs.writeFileSync(settingsPath, settings, 'utf-8');
-            alert('Settings saved successfully!');
+            console.log('Settings saved successfully!');
         } catch (err) {
-            alert('Error saving settings.');
+            console.log('Error saving settings.');
             console.error(err);
         }
 
@@ -50,6 +38,7 @@ function handlePathSelection(event) {
 }
 
 function loadSettings() {
+    const fs = require('fs');
     fs.readFile(settingsPath, 'utf-8', (err, data) => {
         if (err) {
             console.error(err);

@@ -15,6 +15,11 @@ if (typeof path === 'undefined') {
 if (typeof $ === 'undefined') {
 }
 
+function getPath(file){
+    const path = require('path');
+    return path.join(__dirname, '../model', `${file}`);
+}
+
 function getCheckedCheckboxes() {
     const checkedCheckboxes = $('#excel-overview input[type="checkbox"]:checked');
     let checkedValues = [];
@@ -61,14 +66,14 @@ document.getElementById('capture-button').addEventListener('click', function (e)
                 if (body.error) {
                     console.error(`Details: ${body.error}`);
                 }
-                alert(`Error from OCR: ${body.message}`);
+                console.log(`Error from OCR: ${body.message}`);
                 return;
             }
 
             const result = body.floats;
 
             if (result == null) {
-                alert("Numbers were not read correctly");
+                console.log("Numbers were not read correctly");
                 return;
             }
 
@@ -95,10 +100,10 @@ document.getElementById('capture-button').addEventListener('click', function (e)
             }
         })
         .catch(err => {
-            alert("Error from OCR: " + err.message);
+            console.log("Error from OCR: " + err.message);
         });
     } catch (err) {
-        alert(err.message);
+        console.log(err.message);
         return;
     }
 });
@@ -111,14 +116,14 @@ document.getElementById('accept').addEventListener('click', function (e) {
     var image_counter = window.sessionStorage.getItem('image_counter');
 
     if (checked_data === null || checked_data.length === 0) {
-        alert("No values were chosen");
+        console.log("No values were chosen");
         return;
     }
 
     try {
-        exec(`python3 model/manage_excel.py "write" "${filename}" "${JSON.stringify(checked_data)}" "${image_counter}"`, (error, stdout, stderr) => {
+        exec(`python3 "${getPath("manage_excel.py")}" "write" "${filename}" "${JSON.stringify(checked_data)}" "${image_counter}"`, (error, stdout, stderr) => {
             if (error) {
-                alert(`exec error: ${error}\nstderr: ${stderr}`);
+                console.log(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
             }
         });
@@ -126,18 +131,28 @@ document.getElementById('accept').addEventListener('click', function (e) {
         excelOverview.innerHTML = ''; 
         window.sessionStorage.setItem('image_counter', ++image_counter);
     } catch (err) {
-        alert(err.message);
+        console.log(err.message);
         return;
     }
 });
 
 document.getElementById('stop').addEventListener('click', function (e) {
     e.preventDefault();
+    // let pythonServerPid = window.sessionStorage.getItem('pythonServerPid');
+    // if (pythonServerPid) {
+    //     try {
+    //         process.kill(pythonServerPid);
+    //         console.log(`Killed Python server with PID ${pythonServerPid}`);
+    //     } catch (err) {
+    //         console.log(`Failed to kill Python server: ${err.message}`);
+    //     }
+    //     window.sessionStorage.removeItem('pythonServerPid');
+    // }
     try {
         const filename = window.sessionStorage.getItem('filename');
-        exec(`python3 model/minify.py "${filename}"`, (error, stdout, stderr) => {
+        exec(`python3 "${getPath("minify.py")}" "${filename}"`, (error, stdout, stderr) => {
             if (error) {
-                alert(`exec error: ${error}\nstderr: ${stderr}`);
+                console.log(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
             }
             const excelOverview = document.getElementById('content');
@@ -147,7 +162,7 @@ document.getElementById('stop').addEventListener('click', function (e) {
         window.sessionStorage.removeItem('image_counter');
         window.sessionStorage.removeItem('filename');
     } catch (err) {
-        alert(err.message);
+        console.log(err.message);
         return;
     }
 });

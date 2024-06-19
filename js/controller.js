@@ -1,44 +1,49 @@
-// controller.js
-window.$ = window.jQuery = require('jquery');
-$(document).ready(function() {
-    $('#navbar-container').load('./navbar.html');
-    
-    function loadSettingsPage() {
+document.addEventListener('DOMContentLoaded', () => {
+    const $ = require('jquery');
+
+    $(document).ready(function() {
+      $('#navbar-container').load('./navbar.html');
+  
+      function loadSettingsPage() {
         $('#content').empty(); // Clear previous content
         $('#content').load('./settings.html');
-    }
-
-    function preprocessingPage() {
+      }
+  
+      function preprocessingPage() {
         $('#content').empty(); // Clear previous content
         $('#content').load('./image_preprocessing_dashboard.html');
-    }
-
-    window.loadOverview = function() {
+      }
+  
+      window.loadOverview = function() {
         $('#content').empty(); // Clear previous content
-    }
-    
-    function newDoc() {
+      }
+  
+      function newDoc() {
         $('#content').empty(); // Clear previous content
         $('#content').load('./new_document.html');
-    }
-    
-    $(document).on('click', '#settings-link', function(e) {
+      }
+  
+      $(document).on('click', '#settings-link', function(e) {
         e.preventDefault();
         loadSettingsPage();
-    });
-    
-    $(document).on('click', '#overview-link', function(e) {
+      });
+  
+      $(document).on('click', '#overview-link', function(e) {
         e.preventDefault();
         loadOverview();
-    });
-    
-    $(document).on('click', '#newdoc-link', function(e) {
+      });
+  
+      $(document).on('click', '#newdoc-link', function(e) {
         e.preventDefault();
         newDoc();
-    });
-
-    $(document).on('click', '#preprocessing-link', function(e) {
+      });
+  
+      $(document).on('click', '#preprocessing-link', function(e) {
         e.preventDefault();
         preprocessingPage();
+      });
     });
-});
+  
+    // console.log(window.modules.test + " \nasdads");
+  });
+  

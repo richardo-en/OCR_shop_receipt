@@ -6,13 +6,19 @@ if (typeof fs === 'undefined') {
 // if (typeof exec === 'undefined') {
 // }
 
+function getPath(file){
+    const path = require('path');
+    return path.join(__dirname, '../model/', `${file}`);
+}
 
 function loadSettingsFromFile() {
-    const filePath = 'image_preprocessing.txt';
+    const path = require('path');
+    // const filePath = 'image_preprocessing.txt';
+    const filePath = path.join(__dirname, '../image_preprocessing.txt');
     
     fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
-            alert('Error reading settings file:', err);
+            console.log('Error reading settings file:', err);
             return;
         }
         
@@ -43,7 +49,9 @@ function loadSettingsFromFile() {
 }
 
 function save_checks(){
-    const filePath = 'image_preprocessing.txt';
+    const path = require('path');
+    // const filePath = 'image_preprocessing.txt';
+    const filePath = path.join(__dirname, '../image_preprocessing.txt');
     const checkboxes = document.querySelectorAll('.preprocessing_checks');
     const settings = Array.from(checkboxes).map(checkbox => {
         if (checkbox.checked) {
@@ -64,7 +72,7 @@ function save_checks(){
             // File doesn't exist, create it
             fs.writeFile(filePath, settingsString, (err) => {
                 if (err) {
-                    alert('Error creating settings file:', err);
+                    console.log('Error creating settings file:', err);
                     return;
                 }
                 console.log('Settings file created.');
@@ -73,7 +81,7 @@ function save_checks(){
             // File exists, write the settings
             fs.writeFile(filePath, settingsString, (err) => {
                 if (err) {
-                    alert('Error saving settings:', err);
+                    console.log('Error saving settings:', err);
                     return;
                 }
                 // console.log('Settings saved.');
@@ -83,30 +91,34 @@ function save_checks(){
 }
 
 function update_preprocessed_image(action){
-    console.log("calling");
+    const path = require('path');
+    // console.log("calling");
     const { exec } = require('child_process');
-        save_checks();
-        exec(`python3 model/image_preprocessing.py "${action}"`, (error, stdout, stderr) => {
+    save_checks();
+        exec(`python3 "${getPath("image_preprocessing.py")}" "${action}"`, (error, stdout, stderr) => {
             if (error) {
-                alert(`exec error: ${error}\nstderr: ${stderr}`);
+                console.log(`exec error: ${error}\nstderr: ${stderr}`);
                 console.log(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
             }
             result = JSON.parse(stdout);   
             // console.log("asdasd " + result);
             if(result == null){
-                alert("You need to capture image first");
+                console.log("You need to capture image first");
                 return;
             } 
             const notProcessedImg = document.getElementById('not_proccesed_image');
             const processedImg = document.getElementById('proccesed_image');
+            
     
             notProcessedImg.dataset.src = ''
             processedImg.dataset.src = '';
-            notProcessedImg.src = '../not_preprocessed.png?' + Date.now();
-            processedImg.src = '../processed_data.png?' + Date.now();
-        });
-}
+            console.log(path.join(__dirname, '../not_preprocessed.png?' + Date.now()));
+            notProcessedImg.src = path.join(__dirname, '../not_preprocessed.png?' + Date.now());
+            processedImg.src = path.join(__dirname, '../processed_data.png?' + Date.now());
+            });
+
+    }
 // Call the function to load settings when the page loads
 loadSettingsFromFile();
 
@@ -114,7 +126,7 @@ document.querySelectorAll('.preprocessing_checks').forEach((checkbox) => {
     checkbox.addEventListener('change', function (e) {
         const parentDiv = this.closest('.form-check');
         const sliderContainer = parentDiv.querySelector('.specific_values');
-        update_preprocessed_image();
+        update_preprocessed_image("update");
         if (sliderContainer) {
             if (this.checked) {
                 sliderContainer.classList.remove('d-none');
