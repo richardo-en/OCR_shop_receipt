@@ -5,7 +5,10 @@ settings_name = "settings"
 # Function to load settings from the file
 def load_settings():
     try:
-        with open(f"{settings_name}.txt", "r") as f:
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        settings_path = os.path.join(current_directory, f"../{settings_name}.txt")
+
+        with open(settings_path, "r") as f:
             lines = f.readlines()
             return lines[0].strip(), lines[1].strip(), lines[2].strip() if len(lines) > 1 else ""
     except FileNotFoundError:
@@ -22,15 +25,19 @@ def write_to_excel(file_path, data):
         workbook = openpyxl.load_workbook(file_path)
         sheet = workbook.active
         next_row = sheet.max_row + 1
-        
-        col = 3
+        accepted_data = len(data)
+        # deletion = None
+        if accepted_data == 2: 
+            col = 1
+            # deletion = 0
+        else:
+            col = 3
+            # deletion = 0
         for pair in reversed(data):
             for value in pair:
-                if(value == 0):
-                    value = 0.00 
                 sheet.cell(row=next_row, column=col, value=value)
                 col += 1
-            col-=3
+            # col-=deletion
         
         workbook.save(file_path)
     except Exception as e:

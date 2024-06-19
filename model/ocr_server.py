@@ -15,10 +15,12 @@ class OCRProcessor:
         if not ret:
             return {"error": "Failed to read frame from camera"}
         # cam.release()
-        frame_path = 'captured_frame.png'
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        frame_path = os.path.join(current_directory, "../captured_frame.png")
         cv2.imwrite(frame_path, frame)
 
-        subprocess.check_output(['python3', 'model/image_preprocessing.py', 'preprocess', frame_path])
+        image_preprocessing_path = os.path.join(current_directory, "image_preprocessing.py")
+        subprocess.check_output(['python3', f'{image_preprocessing_path}', 'preprocess', f'{frame_path}'])
         preprocessed_image = cv2.imread(frame_path)
                 
         text = self.perform_ocr(preprocessed_image)

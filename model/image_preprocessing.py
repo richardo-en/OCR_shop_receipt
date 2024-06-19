@@ -81,7 +81,9 @@ def enhance_black_lines(image, bottom, top, thickness):
 
 def preprocess_image(image):   
     options_file_path = 'image_preprocessing.txt'
-    options = read_preprocessing_options(options_file_path)
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    settings_path = os.path.join(current_directory, f"../{options_file_path}")
+    options = read_preprocessing_options(settings_path)
     if options[0][0]:  # Noise Removing
         image = remove_noise(image, options[0][1], options[0][2])
     if options[1][0]:  # Set Grayscale
@@ -100,6 +102,9 @@ def preprocess_image(image):
 
 def main():
     
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    not_proccesed_image = os.path.join(current_directory, "../not_preprocessed.png")
+    
     if sys.argv[1] == "capture":
         excel_path, webcam, folder_path = load_settings()
         if len(webcam) == 1:
@@ -112,15 +117,16 @@ def main():
         if not ret:
             return None
         cam.release()
-        cv2.imwrite("not_preprocessed.png", frame)
+        
+        cv2.imwrite(not_proccesed_image, frame)
         sys.argv[1] = "update"
     
     if sys.argv[1] == "update":
-        img_path = 'not_preprocessed.png'
-        if(os.path.exists(img_path)):
-            image = cv2.imread(img_path)
+        if(os.path.exists(not_proccesed_image)):
+            image = cv2.imread(not_proccesed_image)
             preprocessed_image = preprocess_image(image)
-            cv2.imwrite("processed_data.png", preprocessed_image)
+            preprocess_image_path = os.path.join(current_directory, f"../processed_data.png")
+            cv2.imwrite(preprocess_image_path, preprocessed_image)
         else:
             return print(json.dumps(None))
     elif sys.argv[1] == "preprocess":
