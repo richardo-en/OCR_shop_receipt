@@ -5,7 +5,9 @@
   "description": "System for accountants that captures frames from camera and fetches text from receipts. From These receipts are than taken numbers and are placed to newly created excel file.",
   "main": "main.js",
   "scripts": {
-    "development" : "nodemon --exec electron .",
+    "compile": "tsc && copyfiles -u 1 src/*.html build",
+    "start": "npm run compile && electron .",
+    "development": "nodemon --exec electron .",
     "build": "electron-builder",
     "pack": "electron-builder --dir",
     "postinstall": "electron-builder install-app-deps",
@@ -29,7 +31,7 @@
     "bootstrap": "^5.3.3",
     "electron-squirrel-startup": "^1.0.1",
     "electron-updater": "^6.2.1",
-    "jquery": "^3.7.1"
+    "toastify": "^2.0.1"
   },
   "build": {
     "appId": "com.receipt-system",

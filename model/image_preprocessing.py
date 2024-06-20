@@ -110,13 +110,16 @@ def main():
         if len(webcam) == 1:
             cam = cv2.VideoCapture(int(webcam))
         else:
-            cam = cv2.VideoCapture(webcam)
+            try:
+                cam = cv2.VideoCapture(f'{webcam}')
+            except Exception as e:
+                return print(json.dumps(e))
             
         ret, frame = cam.read()
         
         if not ret:
-            return None
-        cam.release()
+            return print(json.dumps(None))
+        # cam.release()
         
         cv2.imwrite(not_proccesed_image, frame)
         sys.argv[1] = "update"

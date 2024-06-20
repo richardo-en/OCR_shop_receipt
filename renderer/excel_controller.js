@@ -1,40 +1,32 @@
-var fs, path, settings_path, lines;
-const { exec } = require('child_process');
-window.$ = window.jQuery = require('jquery');
-
-if (typeof fs === 'undefined') {
-    var fs = require('fs');
-}
-
-
-if (typeof path === 'undefined') {
-    var path = require('path');
-}
-
-
-if (typeof $ === 'undefined') {
-}
-
-function getPath(file){
-    const path = require('path');
-    return path.join(__dirname, '../model', `${file}`);
-}
-
+//excel controller
 function getCheckedCheckboxes() {
-    const checkedCheckboxes = $('#excel-overview input[type="checkbox"]:checked');
+    const checkedCheckboxes = document.querySelectorAll('#excel-overview input[type="checkbox"]:checked');
     let checkedValues = [];
-    checkedCheckboxes.each(function () {
-        let value = $(this).val();
+    checkedCheckboxes.forEach(checkbox => {
+        let value = checkbox.value;
         checkedValues.push(JSON.parse(value));
     });
     return checkedValues;
 }
 
+async function unInitializeCamera() {
+    try {
+        const response = await fetch('http://localhost:5000/uninit_camera', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
 
-window.onload = function(){
-    settings_path = path.join(__dirname, './../settings.txt');
-    fileContent = fs.readFileSync(settings_path, 'utf-8');
-    lines = fileContent.split('\n')
+        const data = await response.json();
+        if (response.ok) {
+            console.log('Camera initialized:', data.message);
+        } else {
+            console.error('Failed to initialize camera:', data.error);
+        }
+    } catch (error) {
+        console.error('Error initializing camera:', error);
+    }
 }
 
 
@@ -45,16 +37,14 @@ document.getElementById('capture-button').addEventListener('click', function (e)
     excelOverview.innerHTML = ''; 
     try {
         const fileName = window.sessionStorage.getItem('filename');
-        const image_counter = window.sessionStorage.getItem('image_counter');
-        
-        console.log(`Sending request with folder_name: ${fileName}, row_number: ${image_counter}`);
-        
+        const imageCounter = window.sessionStorage.getItem('image_counter');
+                
         fetch('http://localhost:5000/capture', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ folder_name: fileName, row_number: image_counter }),
+            body: JSON.stringify({ folder_name: fileName, row_number: imageCounter }),
         })
         .then(response => response.json().then(data => ({ status: response.status, body: data })))
         .then(({ status, body }) => {
@@ -111,17 +101,17 @@ document.getElementById('capture-button').addEventListener('click', function (e)
 
 
 document.getElementById('accept').addEventListener('click', function (e) {
-    const checked_data = getCheckedCheckboxes();
+    const checkedData = getCheckedCheckboxes();
     const filename = window.sessionStorage.getItem('filename');
-    var image_counter = window.sessionStorage.getItem('image_counter');
+    var imageCounter = window.sessionStorage.getItem('image_counter');
 
-    if (checked_data === null || checked_data.length === 0) {
+    if (checkedData === null || checkedData.length === 0) {
         console.log("No values were chosen");
         return;
     }
 
     try {
-        exec(`python3 "${getPath("manage_excel.py")}" "write" "${filename}" "${JSON.stringify(checked_data)}" "${image_counter}"`, (error, stdout, stderr) => {
+        modules.exec(`python3 "${functions.getPath("model/manage_excel.py")}" "write" "${filename}" "${JSON.stringify(checkedData)}" "${imageCounter}"`, (error, stdout, stderr) => {
             if (error) {
                 console.log(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
@@ -129,7 +119,7 @@ document.getElementById('accept').addEventListener('click', function (e) {
         });
         const excelOverview = document.getElementById('excel-overview');
         excelOverview.innerHTML = ''; 
-        window.sessionStorage.setItem('image_counter', ++image_counter);
+        window.sessionStorage.setItem('image_counter', ++imageCounter);
     } catch (err) {
         console.log(err.message);
         return;
@@ -138,29 +128,23 @@ document.getElementById('accept').addEventListener('click', function (e) {
 
 document.getElementById('stop').addEventListener('click', function (e) {
     e.preventDefault();
-    // let pythonServerPid = window.sessionStorage.getItem('pythonServerPid');
-    // if (pythonServerPid) {
-    //     try {
-    //         process.kill(pythonServerPid);
-    //         console.log(`Killed Python server with PID ${pythonServerPid}`);
-    //     } catch (err) {
-    //         console.log(`Failed to kill Python server: ${err.message}`);
-    //     }
-    //     window.sessionStorage.removeItem('pythonServerPid');
-    // }
     try {
         const filename = window.sessionStorage.getItem('filename');
-        exec(`python3 "${getPath("minify.py")}" "${filename}"`, (error, stdout, stderr) => {
+        modules.exec(`python3 "${functions.getPath("model/minify.py")}" "${filename}"`, (error, stdout, stderr) => {
             if (error) {
                 console.log(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
             }
             const excelOverview = document.getElementById('content');
             excelOverview.innerHTML = ''; 
-            $('#navbar-container').load('./navbar.html');
+            functions.loadHTML('navbar-container', '../view/navbar.html');
+            setTimeout(()=>{
+                ipcRenderer.send('loadControllers');
+            },200)
         });
         window.sessionStorage.removeItem('image_counter');
         window.sessionStorage.removeItem('filename');
+        unInitializeCamera();
     } catch (err) {
         console.log(err.message);
         return;

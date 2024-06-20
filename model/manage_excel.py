@@ -17,6 +17,12 @@ def load_settings():
 # Function to create an Excel file and open it
 def create_and_open_excel_file(path):
     workbook = openpyxl.Workbook()
+    # sheet = workbook.active
+    # row = 0
+    # sheet[f'F{row}'] = f'=C{row}*0.20'
+    # sheet[f'G{row}'] = f'=A{row}*0.10'
+    # sheet[f'H{row}'] = f'=SUM(A{row}:B{row})'
+    # sheet[f'I{row}'] = f'=SUM(C{row}:D{row})'
     workbook.save(path)
 
 # Function to write data to the already opened Excel file
@@ -33,6 +39,9 @@ def write_to_excel(file_path, data):
         else:
             col = 3
             # deletion = 0
+        commands_for_excel = ["=C1*20%", "=A1*10%","=SUM(A1:B1)","=SUM(C1:D1)"]
+        for i in range(4, 8):
+            sheet.cell(row=next_row, column=i, value=commands_for_excel[i-4])
         for pair in reversed(data):
             for value in pair:
                 sheet.cell(row=next_row, column=col, value=value)
