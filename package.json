@@ -62,13 +62,20 @@
         {
           "target": "nsis",
           "arch": ["x64", "ia32", "arm64"]
+        },
+        {
+          "target": "nsisweb"
         }
       ],
       "icon": "icon.ico"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon":"installerIcon.ico",
+      "uninstallerIcon":"installerIcon.ico",
+      "createDesktopShortcut": true,
+      "shortcutName": "Receipt System"
     },
     "extraResources": [
     {
