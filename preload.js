@@ -3,6 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs');
+const Toastify = require('toastify-js');
 
 contextBridge.exposeInMainWorld('functions', {
   getPath:(file) => {
@@ -12,10 +13,18 @@ contextBridge.exposeInMainWorld('functions', {
     return fs.readFileSync(settingsPath, 'utf-8');
   },  
   saveSettings:(settingsPath, data) => {
-    return fs.writeFileSync(settingsPath, data, 'utf-8');
+    try {
+      fs.writeFileSync(settingsPath, data, 'utf-8');
+      return true; 
+    } catch (error) {
+      return error; // Ak dôjde k chybe, vrátime chybu
+    }
   },
   fileExists:(fullFilePath) => {
-    return fs.existsSync(fullFilePath)
+    if(fs.existsSync(fullFilePath))
+      return true
+    else
+      return false
   },
   loadHTML:(containerId, url) => {
     fetch(url)
@@ -45,6 +54,38 @@ activeScript :(newActiveScript, callback) => {
       }
     };
     document.head.appendChild(script);
+  },
+  showMessage: (message, type) => {
+    let errorDesign;
+    if(type == "error")
+      errorDesign = "#cd5c5c";
+    else if(type == "success")
+      errorDesign = "#5adbb5";
+    else if(type == "warning")
+      errorDesign = "#fff44f";
+
+    
+    Toastify({
+      text: message,
+      duration: 2000, // Adjust as needed
+      selector : "messages",
+      close: true,
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
+      style: {
+        background: errorDesign,
+        float: "right",
+        marginTop:"5px",
+        marginRight : "10px",
+        borderBottomLeftRadius : "10px",
+        borderBottomRightRadius : "10px",
+        borderTopLeftRadius : "10px",
+        padding:"8px",
+        position:"relative"
+        
+      },
+    }).showToast();
   }
 });
 

@@ -6,14 +6,16 @@ document.getElementById('save-settings').addEventListener('click', function (eve
     var dataPath = document.getElementById('data_saving').value;
 
     var settings = `${devicePath}\n${webcamIp}\n${dataPath}`;
-
-    try {
-        functions.saveSettings(functions.getPath('settings.txt'), settings);
-        console.log('Settings saved successfully!');
-    } catch (err) {
-        console.log('Error saving settings.');
-        console.log(err);
+    var settingsStatus = functions.saveSettings(functions.getPath('settings.txt'), settings);
+    if(settingsStatus){
+        functions.showMessage("Settings were saved successfuly", "success");
+        document.getElementById('content').innerHTML = '';
     }
-    document.getElementById('content').innerHTML = '';
+    else
+        functions.showMessage("Error saving settings\n" + settingsStatus, "error");
+});
 
+document.getElementById('updateApp').addEventListener('click', function (event) {
+    event.preventDefault()
+    ipcRenderer.send('ManualUpdate');
 });

@@ -1,7 +1,12 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
 const { spawn } = require('child_process');
 const path = require('path');
-const { ipcMain } = require('electron');
+const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.autoDownload = false;
 
 // const { autoUpdater, AppUpdater } = require("electron-updater");
 function getPath(file) {
@@ -9,8 +14,6 @@ function getPath(file) {
   return path.join(__dirname, 'model/', `${file}`);
 }
 
-// autoUpdater.autoDownload = false;
-// autoUpdater.autoInstallOnAppQuit = true;
 
 let mainWindow;
 let pythonServer;
@@ -39,25 +42,40 @@ function createWindow() {
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
+
+  mainWindow.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 }
 
 app.whenReady().then(() => {
+  const menu = Menu.buildFromTemplate([]);
+  Menu.setApplicationMenu(menu);
+
 
   createWindow();
   try {
-    console.log(getPath("ocr_server.py"));
-    pythonServer = spawn('python3', ['./model/ocr_server.py']);
+    pythonServer = spawn('python3', ['./model/ocr_server.py']);    
   } catch (e) {
-    console.log("asdasdas\n" + e);
+    mainWindow.webContents.send('serverStatus', 'Python server did not started successfully!','error');
+    console.log("error during starting local server\n" + e);
   }
-
+  
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
-    // autoUpdater.checkForUpdates();
-
   });
+  // mainWindow.webContents.send('loadMainWindow');
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", "http://localhost:5000", false ); 
+  try{
+    xmlHttp.send( null );
+  }catch(err){
+    mainWindow.webContents.send('serverStatus', 'You cannot scan receipts without local server running', 'error');
+  }
+  mainWindow.webContents.send('serverStatus', 'Python server started successfully','success');
+  
 });
 
 app.on('window-all-closed', function () {
@@ -65,11 +83,44 @@ app.on('window-all-closed', function () {
 });
 
 app.on('quit', () => {
-  // pythonServer.kill();
+  pythonServer.kill();
 });
 
 
 ipcMain.on('loadControllers', () => {
   mainWindow.webContents.send('settingUpControllers');
+});
+
+
+autoUpdater.on('update-available', (info) => {
+  let message = "New update is available! You can switch to new version in settings. :)"
+  if(app.isPackaged)
+    mainWindow.webContents.send('updateStatus', message, "warning");
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  let message = "Your app version is latest. There are not any new updates."
+  if(app.isPackaged)
+    mainWindow.webContents.send('updateStatus', message, "warning");
+
+});
+
+autoUpdater.on('error', (err) => {
+  let message = "Something went wrong with updater.\n" + err;
+  mainWindow.webContents.send('updateStatus', message, "error");
+});
+
+ipcMain.on('ManualUpdate', () => {
+  if(app.isPackaged){
+    autoUpdater.checkForUpdates();
+  }else{
+    let message = "You are in development mode, therefore you cannot update application.";
+    mainWindow.webContents.send('updateStatus', message, "warning");
+  }
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  let message = "Your application was updated.";
+  mainWindow.webContents.send('updateStatus', message, "success");
 });
 

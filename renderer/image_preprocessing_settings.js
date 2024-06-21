@@ -16,57 +16,35 @@ function saveChecks() {
         return '0';
     });
     const settingsString = settings.join('\n');
-
     functions.saveSettings(filePath, settingsString);
-    // modules.fs.access(filePath, modules.fs.constants.F_OK, (err) => {
-    //     if (err) {
-    //         // File doesn't exist, create it
-    //         modules.fs.writeFile(filePath, settingsString, (err) => {
-    //             if (err) {
-    //                 console.log('Error creating settings file:', err);
-    //                 return;
-    //             }
-    //             console.log('Settings file created.');
-    //         });
-    //     } else {
-    //         // File exists, write the settings
-    //         modules.fs.writeFile(filePath, settingsString, (err) => {
-    //             if (err) {
-    //                 console.log('Error saving settings:', err);
-    //                 return;
-    //             }
-    //             // console.log('Settings saved.');
-    //         });
-    //     }
-    // });
 }
 
 function updatePreprocessedImage(action) {
     saveChecks();
     const notProcessedImg = document.getElementById('not_proccesed_image');
     const processedImg = document.getElementById('proccesed_image');
-    modules.exec(`python3 "${("model/image_preprocessing.py")}" "${action}"`, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`exec error: ${error}\nstderr: ${stderr}`);
-            console.log(`exec error: ${error}\nstderr: ${stderr}`);
-            return;
-        }
-        result = JSON.parse(stdout);
-        console.log("asdasd\n" + result);
-        if (result == null) {
-            console.log("You need to capture image first");
-            return;
-        }
-
-
-        notProcessedImg.dataset.src = ''
-        processedImg.dataset.src = '';
-    });
+    try{
+        modules.exec(`python3 "${("model/image_preprocessing.py")}" "${action}"`, (error, stdout, stderr) => {
+            if (error) {
+                functions.showMessage("Something went wrong.\n" + error, "error");
+                return;
+            }
+            result = JSON.parse(stdout);
+            if (result == null) {
+                functions.showMessage("You need to capture image first.", "error");
+                return;
+            }
+            notProcessedImg.dataset.src = ''
+            processedImg.dataset.src = '';
+        });
+    }catch (err){
+        functions.showMessage("Something went wrong.\n" + err, "error");
+    }
     setTimeout(()=>{
 
         notProcessedImg.src = functions.getPath('not_preprocessed.png?' + Date.now());
         processedImg.src = functions.getPath('processed_data.png?' + Date.now());
-    }, 1500);
+    }, 1000);
 
 }
 

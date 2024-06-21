@@ -20,12 +20,14 @@ async function unInitializeCamera() {
 
         const data = await response.json();
         if (response.ok) {
-            console.log('Camera initialized:', data.message);
+            functions.showMessage("Error uninitializing camera. There wasn't propably any connection runnig." , "error");
         } else {
-            console.error('Failed to initialize camera:', data.error);
+            functions.showMessage("Camera was stopped." , "success");
         }
+        return true;
     } catch (error) {
-        console.error('Error initializing camera:', error);
+        functions.showMessage("Error uninitializing camera.\n" + error, "error");
+        return false;
     }
 }
 
@@ -52,18 +54,17 @@ document.getElementById('capture-button').addEventListener('click', function (e)
             console.log(`Python script finished in ${(endTime - startTime) / 1000} seconds.`);
             
             if (status !== 200) {
-                console.error(`Error: ${body.message}`);
+                functions.showMessage(`Error: ${body.message}`, "error");
                 if (body.error) {
-                    console.error(`Details: ${body.error}`);
+                    functions.showMessage(`Details: ${body.error}`, "error");
                 }
-                console.log(`Error from OCR: ${body.message}`);
                 return;
             }
-
+            
             const result = body.floats;
-
+            
             if (result == null) {
-                console.log("Numbers were not read correctly");
+                functions.showMessage("Numbers were not read correctly", "error");
                 return;
             }
 
@@ -77,11 +78,11 @@ document.getElementById('capture-button').addEventListener('click', function (e)
                 checkbox.src = `checkbox-${i/2}`;
                 checkbox.className = "form-check-check";
                 checkbox.value = JSON.stringify([parseFloat(result[i]), parseFloat(result[i + 1])]);
-                
+                checkbox.style = "transform: scale(1.4);"
                 const label1 = document.createElement('label');
                 label1.htmlFor = `checkbox-${i/2}`;
                 label1.innerText = result[i] + "\t" + result[i + 1];
-                label1.className = "form-check-label";
+                label1.className = "form-check-label fs-4 mx-4";
 
                 row.appendChild(checkbox);
                 row.appendChild(label1);
@@ -90,10 +91,10 @@ document.getElementById('capture-button').addEventListener('click', function (e)
             }
         })
         .catch(err => {
-            console.log("Error from OCR: " + err.message);
+            functions.showMessage("Error from OCR: " + err, "error");
         });
     } catch (err) {
-        console.log(err.message);
+        functions.showMessage("Something wen wrong" + err, "error");
         return;
     }
 });
@@ -104,16 +105,16 @@ document.getElementById('accept').addEventListener('click', function (e) {
     const checkedData = getCheckedCheckboxes();
     const filename = window.sessionStorage.getItem('filename');
     var imageCounter = window.sessionStorage.getItem('image_counter');
-
+    
     if (checkedData === null || checkedData.length === 0) {
-        console.log("No values were chosen");
+        functions.showMessage("No values were chosen", "error");
         return;
     }
 
     try {
         modules.exec(`python3 "${functions.getPath("model/manage_excel.py")}" "write" "${filename}" "${JSON.stringify(checkedData)}" "${imageCounter}"`, (error, stdout, stderr) => {
             if (error) {
-                console.log(`exec error: ${error}\nstderr: ${stderr}`);
+                functions.showMessage(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
             }
         });
@@ -121,18 +122,22 @@ document.getElementById('accept').addEventListener('click', function (e) {
         excelOverview.innerHTML = ''; 
         window.sessionStorage.setItem('image_counter', ++imageCounter);
     } catch (err) {
-        console.log(err.message);
+        functions.showMessage(err);
         return;
     }
 });
 
 document.getElementById('stop').addEventListener('click', function (e) {
     e.preventDefault();
+    const settingsPath = functions.getPath('settings.txt');
+    const fileContent = functions.loadSettings(settingsPath);
+    const lines = fileContent.split('\n');
+
     try {
         const filename = window.sessionStorage.getItem('filename');
         modules.exec(`python3 "${functions.getPath("model/minify.py")}" "${filename}"`, (error, stdout, stderr) => {
             if (error) {
-                console.log(`exec error: ${error}\nstderr: ${stderr}`);
+                functions.showMessage(`exec error: ${error}\nstderr: ${stderr}`);
                 return;
             }
             const excelOverview = document.getElementById('content');
@@ -144,9 +149,11 @@ document.getElementById('stop').addEventListener('click', function (e) {
         });
         window.sessionStorage.removeItem('image_counter');
         window.sessionStorage.removeItem('filename');
-        unInitializeCamera();
+        if(lines[1].length > 1)
+            unInitializeCamera();
+        functions.showMessage("Your file was saved successfuly." , "success");
     } catch (err) {
-        console.log(err.message);
+        functions.showMessage(err);
         return;
     }
 });

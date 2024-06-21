@@ -92,7 +92,16 @@ function setActions(){
     setActions()
   );
   
+  
+  ipcRenderer.on('updateStatus' , (message, type) => {
+    functions.showMessage(message, type);
+  });
+
+  ipcRenderer.on('serverStatus' , (message, type) => {
+    functions.showMessage(message, type);
+  });
+  
   functions.loadHTML('navbar-container', '../view/navbar.html');
   setTimeout(()=>{
     setActions();
-  }, 50)
+  }, 100)

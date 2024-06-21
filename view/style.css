@@ -1,0 +1,38 @@
+body{
+    background-image: url('./ocr\ program\ background.svg');
+    background-repeat: no-repeat;
+    /* background-size: contain; */
+}
+#content{
+    margin-top: 10vh;
+}
+#header{
+    color: white;
+    text-shadow: rgb(198, 158, 0) 1px 0 10px;
+}
+.toast-close {
+    background: transparent !important;
+    border: none !important;
+}
+#messages{
+    position: absolute;
+    z-index: 100;
+    display: flex;
+    right: 0;
+    flex-direction: column;
+    justify-content: start;
+    height: 100vh;
+    align-items: end;
+}
+.settings_container{
+    display: flex;
+    flex-direction: column;
+    width: auto;
+}
+.item {
+    align-self: flex-start;
+}
+.toastify{
+    align-self: flex-end;
+
+}
