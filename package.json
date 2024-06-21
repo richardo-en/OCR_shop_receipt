@@ -1,7 +1,7 @@
 {
-  "name": "blockovy-system",
-  "productName": "Bločkovy System",
-  "version": "0.0.1",
+  "name": "receipt-system",
+  "productName": "Receipt System",
+  "version": "1.0.0",
   "description": "System for accountants that captures frames from camera and fetches text from receipts. From These receipts are than taken numbers and are placed to newly created excel file.",
   "main": "main.js",
   "scripts": {
@@ -15,12 +15,11 @@
   },
   "author": "Richard Nemeth",
   "keywords": [
-    "Bločkový",
-    "blockovy",
+    "Receipt system",
     "receipt",
-    "Bločkový system",
-    "blockovy system",
-    "receipt system"
+    "Receipt",
+    "block",
+    "Block"
   ],
   "license": "MIT",
   "devDependencies": {
@@ -41,18 +40,28 @@
       "output": "dist"
     },
     "files": [
-      "model/*.py",
-      "view/",
-      "main.js",
-      "package.json",
-      "icon.ico",
-      "./preload.js"
+    "**/*",
+    "!node_modules/",
+    "!model/__pycache__",
+    "!dist/",
+    "!.vscode/",
+    "!.gitignore",
+    "!*.png",
+    "!*.txt",
+    "!forge.config.js",
+    "!*.nsi"
     ],
+    "publish": {
+      "provider": "github",
+      "owner": "richardo-en",
+      "repo": "OCR_shop_receipt"
+    },
     "win": {
       "requestedExecutionLevel": "requireAdministrator",
       "target": [
         {
-          "target": "nsis"
+          "target": "nsis",
+          "arch": ["x64", "ia32", "arm64"]
         }
       ],
       "icon": "icon.ico"
@@ -60,6 +69,19 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "extraResources": [
+    {
+      "from": "model/",
+      "to": "model",
+      "filter": "**/*.py"
     }
+  ],
+  "extraFiles": [
+    {
+      "from": "model/*.py",
+      "to": "resources/model/*.py"
+    }
+  ]
   }
 }

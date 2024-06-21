@@ -4,3 +4,5 @@ build
 out
 model/__pycache__
 settings.txt
+*.png
+*.txt
