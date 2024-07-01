@@ -5,7 +5,11 @@ out
 model/__pycache__
 settings.txt
 *.png
+<<<<<<< HEAD
 *.txt
 *.bat
 .vscode
 yarn.lock
+=======
+*.txt
+>>>>>>> origin/main

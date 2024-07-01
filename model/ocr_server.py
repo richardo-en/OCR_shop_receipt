@@ -37,6 +37,7 @@ class OCRProcessor():
     def __init__(self):
         self.reader = easyocr.Reader(['sk', 'en'], gpu=True, quantize=True)
         self.cam = None  # Initially, no camera is initialized
+<<<<<<< HEAD
         self.extracted_text = None
         self.floats  = None
         self.image_name = None
@@ -79,6 +80,32 @@ class OCRProcessor():
             return False
         
         self.initialize_camera("uninitialize")
+=======
+
+    def initialize_camera(self, action):
+        if(action == "initialize"):
+            excel_path, webcam, folder_path = load_settings()
+            if len(webcam) == 1:
+                self.cam = cv2.VideoCapture(int(webcam))
+            else:
+                self.cam = cv2.VideoCapture(webcam)
+            return self.cam.isOpened()
+        elif action == "uninitialize":
+            if self.cam and self.cam.isOpened():
+                self.cam.release()
+                self.cam = None
+                return True
+            else:
+                return False
+
+    def capture_frames(self):
+        if self.cam is None or not self.cam.isOpened():
+            return {"error": "Camera is not initialized"}
+        
+        ret, frame = self.cam.read()
+        if not ret:
+            return {"error": "Failed to read frame from camera"}
+>>>>>>> origin/main
         current_directory = os.path.dirname(os.path.abspath(__file__))
         frame_path = os.path.join(current_directory, "../not_preprocessed.png")
         cv2.imwrite(frame_path, frame)
@@ -107,6 +134,13 @@ class OCRProcessor():
             
         preprocessed_image = functions_manager.image_preprocessor.preprocess_image(frame)
 
+<<<<<<< HEAD
+=======
+        image_preprocessing_path = os.path.join(current_directory, "image_preprocessing.py")
+        subprocess.check_output(['python3', f'{image_preprocessing_path}', 'preprocess', f'{frame_path}'])
+        preprocessed_image = cv2.imread(frame_path)
+
+>>>>>>> origin/main
         text = self.perform_ocr(preprocessed_image)
         self.message = "problem with preforming ocr"
         if text and not isinstance(text, dict):
@@ -153,7 +187,11 @@ class OCRProcessor():
 
     def extract_floats_from_dph(self, text):
         import re
+<<<<<<< HEAD
         text_upper = str(text).upper()
+=======
+        text_upper = text.upper()
+>>>>>>> origin/main
         trimmed_text = self.trim_text(text)
         if(not trimmed_text):
             return self.extract_floats(trimmed_text)
@@ -176,8 +214,14 @@ class OCRProcessor():
 
 class DataManager():
 
+<<<<<<< HEAD
     def create_folder(self, folder_name):
         folder_path = os.path.join(setting_manager.dataPath, folder_name)
+=======
+    def create_folder(self, image_name, image, folder_name):
+        _, _, folder_path = load_settings()
+        folder_path = os.path.join(folder_path, folder_name)
+>>>>>>> origin/main
         images_path = os.path.join(folder_path, "images")
         if not os.path.exists(folder_path):
             try:
@@ -189,10 +233,16 @@ class DataManager():
         print("Folder and image created successfully")
         return True
 
+<<<<<<< HEAD
     def write_to_csv(self, row_number, data):
         # data = json.dumps(data)
         folder_path = os.path.join(setting_manager.dataPath, setting_manager.file_name)
         csv_filename = f"{setting_manager.file_name}_data.csv"
+=======
+    def write_to_csv(self, folder_name, img_name, extracted_text, floats, row_number):
+        folder_path = os.path.join(load_settings()[2], folder_name)
+        csv_filename = f"{folder_name}_data.csv"
+>>>>>>> origin/main
         csv_path = os.path.join(folder_path, csv_filename)
         file_exists = os.path.isfile(csv_path)
 
@@ -210,7 +260,11 @@ class DataManager():
         while len(rows) <= row_number:
             rows.append([''] * 4)
 
+<<<<<<< HEAD
         rows[row_number] = [ocr_processor.image_name, ocr_processor.extracted_text, ocr_processor.floats, json.dumps(data)]
+=======
+        rows[row_number] = [img_name, extracted_text, json.dumps(floats), '']
+>>>>>>> origin/main
 
         with open(csv_path, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
@@ -242,6 +296,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == '/init_camera':
+<<<<<<< HEAD
             # print(f"Received request to initialize camera: {data}")
             if ocr_processor.initialize_camera("initialize"):
                 self._send_response({"success": "Camera was initialized"}, status=200)
@@ -252,11 +307,20 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         
         elif self.path == '/uninit_camera':
+=======
+            if ocr_processor.initialize_camera("initialize"):
+                self._send_response({"message": "Camera initialized successfully"})
+            else:
+                self._send_response({"error": "Failed to initialize camera"}, status=500)
+        
+        if self.path == '/uninit_camera':
+>>>>>>> origin/main
             if ocr_processor.initialize_camera("uninitialize"):
                 self._send_response({"message": "Camera uninitialized successfully"})
             else:
                 self._send_response({"error": "Failed to uninitialize camera"}, status=500)
 
+<<<<<<< HEAD
         elif self.path == '/capture':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
@@ -320,10 +384,35 @@ class RequestHandler(BaseHTTPRequestHandler):
                 filename = data.get('file_name')
                 setting_manager.file_name = filename
                 folder_response = data_manager.create_folder(filename)
+=======
+        if self.path == '/capture':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data)
+
+            folder_name = data.get('folder_name')
+            row_number = data.get('row_number')
+
+            if not folder_name or not row_number:
+                self._send_response({"message": "Missing folder_name or row_number"}, status=400)
+                return
+
+            row_number = int(row_number)
+            image_name = f'{folder_name}_data_{row_number}.png'
+
+            result = ocr_processor.capture_frames()
+            # if isinstance(result, dict) and "error" in result:
+            #     continue
+
+            floats, image, text = result
+            if result and len(floats) % 2 == 0:
+                folder_response = data_manager.create_folder(image_name, image, folder_name)
+>>>>>>> origin/main
                 if isinstance(folder_response, dict) and "error" in folder_response:
                     print(folder_response["error"])
                     self._send_response(folder_response, status=500)
                     return
+<<<<<<< HEAD
                 excel_manager.create_and_open_excel_file(filename, setting_manager.devicePath)
                 self._send_response({"message": 'Excel file was created'})
                 
@@ -368,11 +457,23 @@ ocr_processor = OCRProcessor()
 data_manager = DataManager()
 
 
+=======
+                data_manager.write_to_csv(folder_name, image_name, text, floats, row_number)
+                self._send_response({"floats": floats, "message": "Processing successful"})
+                return
+            else:
+                self._send_response({"message": "Couldn't find enough floats"}, status=400)
+                return
+>>>>>>> origin/main
 
 def run(server_class=HTTPServer, handler_class=RequestHandler, port=5000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
+<<<<<<< HEAD
     print(json.dumps('Server ready'))
+=======
+    print(json.dumps(f'success'))
+>>>>>>> origin/main
     httpd.serve_forever()
 
 if __name__ == '__main__':

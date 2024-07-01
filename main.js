@@ -1,16 +1,24 @@
+<<<<<<< HEAD
 const { app } = require('electron');
 const { BrowserWindow, ipcMain, Menu } = require('electron');
+=======
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+>>>>>>> origin/main
 const { spawn } = require('child_process');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
+<<<<<<< HEAD
 const fs = require('fs').promises;
 const pythonExecutable = getPath('python/bin/python3');
 
+=======
+>>>>>>> origin/main
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 autoUpdater.autoDownload = false;
+<<<<<<< HEAD
 process.env.NODE_ENV = 'development';
 // const { autoUpdater, AppUpdater } = require("electron-updater");
 function getPath(file) {
@@ -30,6 +38,13 @@ function getPythonPath(file) {
     basePath = __dirname;
   }
   return path.join(basePath, 'model', file);
+=======
+
+// const { autoUpdater, AppUpdater } = require("electron-updater");
+function getPath(file) {
+  const path = require('path');
+  return path.join(__dirname, 'model/', `${file}`);
+>>>>>>> origin/main
 }
 
 
@@ -51,11 +66,19 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'view/index.html'));
+<<<<<<< HEAD
   if (process.env.NODE_ENV != 'production') {
     mainWindow.webContents.openDevTools();
     mainWindow.webContents.debugger.attach('1.3');
     mainWindow.webContents.debugger.sendCommand('Network.enable');
   }
+=======
+  mainWindow.webContents.openDevTools();  // Automatické otvorenie dev tools
+
+  // Toto vám umožní pripojiť sa na tento port pre remote debugging
+  // mainWindow.webContents.debugger.attach('1.3');
+  // mainWindow.webContents.debugger.sendCommand('Network.enable');
+>>>>>>> origin/main
 
   mainWindow.on('closed', function () {
     mainWindow = null;
@@ -66,6 +89,7 @@ function createWindow() {
   });
 }
 
+<<<<<<< HEAD
 
 async function checkServerRunning(url, interval = 1000, timeout = 30000) {
   return new Promise((resolve, reject) => {
@@ -143,6 +167,36 @@ app.whenReady().then(async () => {
   }
   mainWindow.webContents.send('serverStatus', 'Your local server is running properly and you can start working :)', 'success');
 
+=======
+app.whenReady().then(() => {
+  const menu = Menu.buildFromTemplate([]);
+  Menu.setApplicationMenu(menu);
+
+
+  createWindow();
+  try {
+    pythonServer = spawn('python3', ['./model/ocr_server.py']);    
+  } catch (e) {
+    mainWindow.webContents.send('serverStatus', 'Python server did not started successfully!','error');
+    console.log("error during starting local server\n" + e);
+  }
+  
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+  // mainWindow.webContents.send('loadMainWindow');
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open( "GET", "http://localhost:5000", false ); 
+  try{
+    xmlHttp.send( null );
+  }catch(err){
+    mainWindow.webContents.send('serverStatus', 'You cannot scan receipts without local server running', 'error');
+  }
+  mainWindow.webContents.send('serverStatus', 'Python server started successfully','success');
+  
+>>>>>>> origin/main
 });
 
 app.on('window-all-closed', function () {
@@ -158,6 +212,7 @@ ipcMain.on('loadControllers', () => {
   mainWindow.webContents.send('settingUpControllers');
 });
 
+<<<<<<< HEAD
 ipcMain.on('tryLoadNavbar', () => {
   mainWindow.webContents.send('loadNavbar');
 });
@@ -166,12 +221,22 @@ ipcMain.on('tryLoadNavbar', () => {
 autoUpdater.on('update-available', (info) => {
   let message = "New update is available! You can switch to new version in settings. :)"
   if (app.isPackaged)
+=======
+
+autoUpdater.on('update-available', (info) => {
+  let message = "New update is available! You can switch to new version in settings. :)"
+  if(app.isPackaged)
+>>>>>>> origin/main
     mainWindow.webContents.send('updateStatus', message, "warning");
 });
 
 autoUpdater.on('update-not-available', (info) => {
   let message = "Your app version is latest. There are not any new updates."
+<<<<<<< HEAD
   if (app.isPackaged)
+=======
+  if(app.isPackaged)
+>>>>>>> origin/main
     mainWindow.webContents.send('updateStatus', message, "warning");
 
 });
@@ -182,25 +247,35 @@ autoUpdater.on('error', (err) => {
 });
 
 ipcMain.on('ManualUpdate', () => {
+<<<<<<< HEAD
   if (app.isPackaged) {
     autoUpdater.checkForUpdates();
   } else {
+=======
+  if(app.isPackaged){
+    autoUpdater.checkForUpdates();
+  }else{
+>>>>>>> origin/main
     let message = "You are in development mode, therefore you cannot update application.";
     mainWindow.webContents.send('updateStatus', message, "warning");
   }
 });
 
+<<<<<<< HEAD
 ipcMain.handle('getSettingsPath', (event, file) => {
   const settingsPath = path.join(app.getPath('userData'), `${file}`);
   return settingsPath;
 });
 
 
+=======
+>>>>>>> origin/main
 autoUpdater.on('update-downloaded', (info) => {
   let message = "Your application was updated.";
   mainWindow.webContents.send('updateStatus', message, "success");
 });
 
+<<<<<<< HEAD
 
 ipcMain.handle('readFile', async (event, filename) => {
   try {
@@ -251,3 +326,5 @@ ipcMain.handle('writeFile', async (event, filename, data) => {
     return error;
   }
 });
+=======
+>>>>>>> origin/main
