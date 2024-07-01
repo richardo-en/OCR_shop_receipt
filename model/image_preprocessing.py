@@ -20,7 +20,6 @@ class ImagePreprocessing:
         if angle < -45:
             angle = -(90 + angle)
         else:
-<<<<<<< HEAD
             angle = -angle
         (h, w) = image.shape[:2]
         center = (w // 2, h // 2)
@@ -54,28 +53,6 @@ class ImagePreprocessing:
     def enhance_black_lines(self, image, bottom, top, thickness):
         if len(image.shape) == 3 and image.shape[2] == 3:
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-=======
-            try:
-                cam = cv2.VideoCapture(f'{webcam}')
-            except Exception as e:
-                return print(json.dumps(e))
-            
-        ret, frame = cam.read()
-        
-        if not ret:
-            return print(json.dumps(None))
-        # cam.release()
-        
-        cv2.imwrite(not_proccesed_image, frame)
-        sys.argv[1] = "update"
-    
-    if sys.argv[1] == "update":
-        if(os.path.exists(not_proccesed_image)):
-            image = cv2.imread(not_proccesed_image)
-            preprocessed_image = preprocess_image(image)
-            preprocess_image_path = os.path.join(current_directory, f"../processed_data.png")
-            cv2.imwrite(preprocess_image_path, preprocessed_image)
->>>>>>> origin/main
         else:
             gray = image
         _, thresh = cv2.threshold(gray, bottom, top, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)

@@ -7,7 +7,6 @@ const Toastify = require('toastify-js');
 
 contextBridge.exposeInMainWorld('functions', {
   getPath:(file) => {
-<<<<<<< HEAD
     return path.join(
       process.env.NODE_ENV === 'production' ? process.resourcesPath : __dirname, `${file}`);
   },
@@ -17,27 +16,6 @@ contextBridge.exposeInMainWorld('functions', {
     else
       return false
   },
-=======
-    return path.join(__dirname, `${file}`);
-  },
-  loadSettings:(settingsPath) => {
-    return fs.readFileSync(settingsPath, 'utf-8');
-  },  
-  saveSettings:(settingsPath, data) => {
-    try {
-      fs.writeFileSync(settingsPath, data, 'utf-8');
-      return true; 
-    } catch (error) {
-      return error; // Ak dôjde k chybe, vrátime chybu
-    }
-  },
-  fileExists:(fullFilePath) => {
-    if(fs.existsSync(fullFilePath))
-      return true
-    else
-      return false
-  },
->>>>>>> origin/main
   loadHTML:(containerId, url) => {
     fetch(url)
         .then(response => response.text())
@@ -112,12 +90,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   send: (channel, data) => ipcRenderer.send(channel, data),
   on: (channel, func) =>
     ipcRenderer.on(channel, (event, ...args) => func(...args)),
-<<<<<<< HEAD
   invoke: async (channel, ...args) => {
     return ipcRenderer.invoke(channel, ...args);
   }
-=======
->>>>>>> origin/main
 });
 
 contextBridge.exposeInMainWorld('Toastify', {
