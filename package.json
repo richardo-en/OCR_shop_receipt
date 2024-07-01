@@ -1,35 +1,38 @@
 {
-  "name": "blockovy-system",
-  "productName": "Bločkovy System",
-  "version": "0.0.1",
+  "name": "receipt-system",
+  "productName": "Receipt System",
+  "version": "1.0.0",
   "description": "System for accountants that captures frames from camera and fetches text from receipts. From These receipts are than taken numbers and are placed to newly created excel file.",
   "main": "main.js",
   "scripts": {
-    "development" : "nodemon --exec electron .",
+    "compile": "tsc && copyfiles -u 1 src/*.html build",
+    "start": "npm run compile && electron .",
+    "development": "NODE_ENV=development npx nodemon --exec electron .",
     "build": "electron-builder",
     "pack": "electron-builder --dir",
-    "postinstall": "electron-builder install-app-deps",
-    "distwin": "electron-builder -- --win -x64"
+    "dist": "NODE_ENV=production electron-builder --windows",
+    "postinstall": "electron-builder install-app-deps"
   },
   "author": "Richard Nemeth",
   "keywords": [
-    "Bločkový",
-    "blockovy",
+    "Receipt system",
     "receipt",
-    "Bločkový system",
-    "blockovy system",
-    "receipt system"
+    "Receipt",
+    "block",
+    "Block"
   ],
   "license": "MIT",
   "devDependencies": {
     "electron": "^30.0.9",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "node-fetch": "^3.3.2"
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "electron-log": "^5.1.5",
     "electron-squirrel-startup": "^1.0.1",
     "electron-updater": "^6.2.1",
-    "jquery": "^3.7.1"
+    "toastify-js": "^1.12.0"
   },
   "build": {
     "appId": "com.receipt-system",
@@ -38,25 +41,63 @@
       "output": "dist"
     },
     "files": [
-      "model/*.py",
-      "view/",
-      "main.js",
-      "package.json",
-      "icon.ico",
-      "./preload.js"
+      "**/*",
+      "node_modules",
+      "model/*",
+      "!model/__pycache__",
+      "!dist/",
+      "!.vscode/",
+      "!.gitignore",
+      "!*.png",
+      "*.txt",
+      "!forge.config.js",
+      "!*.nsi"
     ],
+    "extraFiles": [
+      {
+        "from": "model/",
+        "to": "resources/model",
+        "filter": "**/*.py"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "model/",
+        "to": "resources/model",
+        "filter": "**/*.py"
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "/model/*.py",
+      "*.txt"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "richardo-en",
+      "repo": "OCR_shop_receipt"
+    },
     "win": {
       "requestedExecutionLevel": "requireAdministrator",
       "target": [
         {
-          "target": "nsis"
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32",
+            "arm64"
+          ]
         }
       ],
       "icon": "icon.ico"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "installerIcon.ico",
+      "uninstallerIcon": "installerIcon.ico",
+      "createDesktopShortcut": true,
+      "shortcutName": "Receipt System"
     }
   }
 }

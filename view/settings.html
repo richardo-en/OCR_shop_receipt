@@ -1,12 +1,15 @@
 <title>Settings</title>
-<script src="../js/settings.js" ></script>
 <form id="settings-form">
-    <label for="path-input">Folder for your Excel file:</label>
-    <input class="form-control form-control-lg my-2 w-50" type="text" id="path-input" name="path" placeholder="Enter path" aria-label="Enter path">
-    <label for="webcam">Ip to webcam:</label>
-    <input class="form-control form-control-lg my-2 w-50" type="text" id="webcam" name="webcam" placeholder="Webcam ip" aria-label="Webcam ip">
-    <label for="webcam">Path for data collecting:</label>
-    <input class="form-control form-control-lg my-2 w-50" type="text" id="data_saving" name="data_saving" placeholder="Path for processed data" aria-label="Save processed data">
+    <div class="settings_container">
+        <label for="path-input">Folder for your Excel file:</label>
+        <input class="form-control form-control-lg my-2 w-50 item" type="text" id="path-input" name="path" placeholder="Enter path" aria-label="Enter path">
+        <!-- <input class="form-control form-control-lg my-2 w-50" type="file" id="path-input" name="path" placeholder="Enter path" aria-label="Enter path"> -->
+        <label for="webcam">Ip to webcam:</label>
+        <input class="form-control form-control-lg my-2 w-50 item" type="text" id="webcam" name="webcam" placeholder="Webcam ip" aria-label="Webcam ip">
+        <label for="webcam">Path for data collecting:</label>
+        <input class="form-control form-control-lg my-2 w-50 item" type="text" id="data_saving" name="data_saving" placeholder="Path for processed data" aria-label="Save processed data">
+        <button class="btn btn-warning my-2 item" id="updateApp">Update App</button>
+    </div>
 
     <button type="submit" class="btn btn-primary my-2" id="save-settings">Save Settings</button>
 </form>

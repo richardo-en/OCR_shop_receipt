@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+out
+model/__pycache__
+settings.txt
+*.png
+*.txt
+*.bat
+.vscode
+yarn.lock
