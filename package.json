@@ -7,11 +7,7 @@
   "scripts": {
     "compile": "tsc && copyfiles -u 1 src/*.html build",
     "start": "npm run compile && electron .",
-<<<<<<< HEAD
     "development": "NODE_ENV=development npx nodemon --exec electron .",
-=======
-    "development": "nodemon --exec electron .",
->>>>>>> origin/main
     "build": "electron-builder",
     "pack": "electron-builder --dir",
     "dist": "NODE_ENV=production electron-builder --windows",
@@ -45,7 +41,6 @@
       "output": "dist"
     },
     "files": [
-<<<<<<< HEAD
       "**/*",
       "node_modules",
       "model/*",
@@ -58,60 +53,31 @@
       "!forge.config.js",
       "!*.nsi"
     ],
-    "extraFiles": [
-      {
-        "from": "model/",
-        "to": "resources/model",
-        "filter": "**/*.py"
-      }
-    ],
     "extraResources": [
       {
         "from": "model/",
-        "to": "resources/model",
-        "filter": "**/*.py"
+        "to": "resources/app.asar.unpacked/model",
+        "filter": "**/*"
       }
     ],
     "asar": true,
     "asarUnpack": [
-      "/model/*.py",
-      "*.txt"
+      "model/*.py"
     ],
-=======
-    "**/*",
-    "!node_modules/",
-    "!model/__pycache__",
-    "!dist/",
-    "!.vscode/",
-    "!.gitignore",
-    "!*.png",
-    "!*.txt",
-    "!forge.config.js",
-    "!*.nsi"
-    ],
->>>>>>> origin/main
     "publish": {
       "provider": "github",
       "owner": "richardo-en",
       "repo": "OCR_shop_receipt"
     },
     "win": {
-      "requestedExecutionLevel": "requireAdministrator",
       "target": [
         {
           "target": "nsis",
-<<<<<<< HEAD
           "arch": [
             "x64",
             "ia32",
             "arm64"
           ]
-=======
-          "arch": ["x64", "ia32", "arm64"]
-        },
-        {
-          "target": "nsisweb"
->>>>>>> origin/main
         }
       ],
       "icon": "icon.ico"
@@ -119,30 +85,10 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-<<<<<<< HEAD
       "installerIcon": "installerIcon.ico",
       "uninstallerIcon": "installerIcon.ico",
       "createDesktopShortcut": true,
       "shortcutName": "Receipt System"
-=======
-      "installerIcon":"installerIcon.ico",
-      "uninstallerIcon":"installerIcon.ico",
-      "createDesktopShortcut": true,
-      "shortcutName": "Receipt System"
-    },
-    "extraResources": [
-    {
-      "from": "model/",
-      "to": "model",
-      "filter": "**/*.py"
->>>>>>> origin/main
     }
-  ],
-  "extraFiles": [
-    {
-      "from": "model/*.py",
-      "to": "resources/model/*.py"
-    }
-  ]
   }
 }

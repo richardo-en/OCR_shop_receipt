@@ -1,6 +1,6 @@
 const { app } = require('electron');
 const { BrowserWindow, ipcMain, Menu } = require('electron');
-const { spawn } = require('child_process');
+const { execFile } = require('child_process');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const log = require('electron-log');
@@ -18,18 +18,30 @@ function getPath(file) {
   return path.join(process.env.NODE_ENV === 'production' ? process.resourcesPath : __dirname, 'model/', `${file}`);
 }
 
+const command = process.env.NODE_ENV === 'production'
+  ? getPythonPath('ocr_server.exe') // Use the executable in production
+  : 'python3'; //
+
 function getPythonPath(file) {
   let basePath;
   if (process.env.NODE_ENV === 'production') {
     basePath = process.resourcesPath;
     // Pokud jsou soubory zabaleny v asar archivu
     if (basePath.endsWith('.asar')) {
-      basePath = basePath.replace(/\.asar$/, '.asar.unpacked');
+      basePath = basePath.replace(/\.asar$/, 'app.asar.unpacked');
     }
   } else {
     basePath = __dirname;
   }
-  return path.join(basePath, 'model', file);
+  try{
+    if(path.join(basePath, 'model', file))
+      return path.join(basePath, 'model', file);
+    else
+      return path.join(basePath, file);
+
+  }catch(err){
+    console.log(err);
+  }
 }
 
 
@@ -64,6 +76,11 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
   });
+
+  console.log(getPythonPath('ocr_server.py'))
+  console.log(path.join(__dirname, '/resources/app.asar/'));
+  console.log(path.join(__dirname, '/resources/app.asar/*'));
+  console.log(command);
 }
 
 
@@ -100,15 +117,23 @@ app.whenReady().then(async () => {
     }
   });
   try {
-    var command =  process.env.NODE_ENV === 'production' ? pythonExecutable : 'python3'
-    pythonServer = spawn(command , [`${getPythonPath('ocr_server.py')}`]);
-    pythonServer.stdout.on('data', (data) => {
-      if (data.toString().includes('Server ready')) {
+    const pythonServer = execFile(command, args, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Python server error: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Python server stderr: ${stderr}`);
+        return;
+      }
+      console.log(stdout);
+      if (stdout.includes('Server ready')) {
         mainWindow.webContents.send('serverStatus', 'Python server started successfully', 'success');
       }
     });
+    
   } catch (e) {
-    mainWindow.webContents.send('serverStatus', 'Python server did not start successfully!', 'error');
+    mainWindow.webContents.send('serverStatus', 'Python server did not start successfully!\n'+e, 'error');
     console.error("Error during starting local server\n" + e);
   }
 

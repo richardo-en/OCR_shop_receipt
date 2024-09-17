@@ -372,11 +372,7 @@ data_manager = DataManager()
 def run(server_class=HTTPServer, handler_class=RequestHandler, port=5000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-<<<<<<< HEAD
     print(json.dumps('Server ready'))
-=======
-    print(json.dumps(f'success'))
->>>>>>> origin/main
     httpd.serve_forever()
 
 if __name__ == '__main__':
